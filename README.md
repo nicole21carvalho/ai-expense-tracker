@@ -157,7 +157,12 @@ Isso cobre o consentimento na aplicação. Em uso real ainda faltariam a políti
 
 ## 📚 O que aprendi
 
-**Todo erro virava logout.** Qualquer falha na API, de um JSON malformado a um erro 500, fazia o front deslogar o usuário. A causa estava longe do sintoma: quando algo falha, o Tomcat reencaminha a requisição para `/error`, esse reencaminhamento não carrega o usuário do token, e o Spring Security respondia 401. O front, corretamente, entendia 401 como sessão expirada. Aprendi a seguir a requisição pelo caminho inteiro em vez de mexer onde o problema aparece.
+**Spring Security foi a parte mais difícil.** Ele funciona como uma cadeia de filtros que roda antes do controller, e quase tudo que dá errado ali aparece como um status HTTP que não explica a causa. Dois casos me ensinaram a ler essa cadeia:
+
+- *Sem token, a API respondia 403.* Esse é o padrão do Spring, mas 403 quer dizer "sei quem você é e você não pode"; o certo é 401, "não sei quem você é". Como o front encerra a sessão ao receber 401, foi preciso um `authenticationEntryPoint` próprio.
+- *Todo erro virava logout.* Qualquer falha na API, de um JSON malformado a um erro 500, deslogava o usuário. A causa estava longe do sintoma: quando algo falha, o Tomcat reencaminha a requisição para `/error`, esse reencaminhamento não carrega o usuário do token, e o Spring Security respondia 401. A correção foi liberar só o reencaminhamento interno (`DispatcherType.ERROR`), sem abrir `/error` para quem chama de fora.
+
+Aprendi a seguir a requisição pelo caminho inteiro, filtro por filtro, em vez de mexer onde o problema aparece.
 
 **Migration aplicada não se edita.** As categorias padrão nasceram sem acento ("Alimentacao"). Corrigir o `V1` não adiantava, porque quem já tinha banco não rodaria a migration de novo, então a correção virou um `V2`. E o `UPDATE` óbvio quebrava para quem já tinha criado "Alimentação" à mão, por causa da chave única. Escrevi um teste que monta um banco no estado do `V1`, com esse usuário dentro, antes de confiar na migration.
 
