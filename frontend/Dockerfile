@@ -1,5 +1,5 @@
 # Mesma versao do CI: o Angular 22 exige Node ^22.22.3 ou ^24.15.0.
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 # npm ci respeita o package-lock exatamente; npm install pode subir versao
 # e quebrar o build so na esteira.
