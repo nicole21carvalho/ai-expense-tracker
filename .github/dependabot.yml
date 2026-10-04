@@ -1,0 +1,36 @@
+# Abre PR semanal quando sai versao nova. Sem isto, as actions fixadas por
+# SHA no CI e as versoes de patch sobrescritas no pom.xml envelheceriam
+# em silencio. Alerta de vulnerabilidade em dependencia chega pelo mesmo canal.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    groups:
+      # Os pacotes do Angular precisam subir juntos; separados, cada PR
+      # quebraria o build por versao desencontrada.
+      angular:
+        patterns:
+          - "@angular/*"
+          - "@angular-devkit/*"
+
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly
