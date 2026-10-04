@@ -24,13 +24,32 @@ updates:
         patterns:
           - "@angular/*"
           - "@angular-devkit/*"
+    ignore:
+      # A versao maior do TypeScript e ditada pelo Angular: o Angular 22 nao
+      # aceita o TypeScript 7, e o npm ci falha. Sobe junto com o ng update.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker
     directory: /backend
     schedule:
       interval: weekly
+    ignore:
+      # Java fica no 21 em todo lugar: pom.xml, CI e as duas imagens. Trocar
+      # de versao maior e decisao do projeto, feita de uma vez, e nao um PR
+      # por imagem que deixa compilacao e execucao em versoes diferentes.
+      - dependency-name: eclipse-temurin
+        update-types: ["version-update:semver-major"]
+      # A tag 3.9-eclipse-temurin-21 ja recebe as correcoes do Maven 3.9 a
+      # cada build. O que o Dependabot propoe aqui e trocar o JDK junto.
+      - dependency-name: maven
 
   - package-ecosystem: docker
     directory: /frontend
     schedule:
       interval: weekly
+    ignore:
+      # Node so em versao LTS, a mesma do CI (setup-node). A troca de versao
+      # maior e feita a mao, nos dois lugares ao mesmo tempo.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
