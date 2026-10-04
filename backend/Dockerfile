@@ -11,7 +11,7 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 # Usuario sem privilegio: se alguem escapar da aplicacao, nao e root.
 RUN addgroup -S cofre && adduser -S cofre -G cofre
