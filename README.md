@@ -155,11 +155,17 @@ Sem chave de IA configurada, o modo por regras roda sozinho, não envia nada par
 
 Isso cobre o consentimento na aplicação. Em uso real ainda faltariam a política de privacidade e a avaliação do contrato com o provedor, que tratam do que ele faz com os dados recebidos.
 
-<!--
 ## 📚 O que aprendi
 
-Preencher depois de rodar — esta seção é a que separa portfólio de pasta. Vale descrever o que quebrou de verdade: a ordem de subida dos containers, o Flyway reclamando do schema, o CORS no primeiro request do Angular.
--->
+**Todo erro virava logout.** Qualquer falha na API, de um JSON malformado a um erro 500, fazia o front deslogar o usuário. A causa estava longe do sintoma: quando algo falha, o Tomcat reencaminha a requisição para `/error`, esse reencaminhamento não carrega o usuário do token, e o Spring Security respondia 401. O front, corretamente, entendia 401 como sessão expirada. Aprendi a seguir a requisição pelo caminho inteiro em vez de mexer onde o problema aparece.
+
+**Migration aplicada não se edita.** As categorias padrão nasceram sem acento ("Alimentacao"). Corrigir o `V1` não adiantava, porque quem já tinha banco não rodaria a migration de novo, então a correção virou um `V2`. E o `UPDATE` óbvio quebrava para quem já tinha criado "Alimentação" à mão, por causa da chave única. Escrevi um teste que monta um banco no estado do `V1`, com esse usuário dentro, antes de confiar na migration.
+
+**`depends_on` não espera o banco ficar pronto.** A API subia antes de o Postgres aceitar conexão e morria no Flyway. `depends_on` só espera o container *iniciar*; foi preciso um `healthcheck` com `pg_isready` e `condition: service_healthy`.
+
+**Porta publicada é porta aberta.** Com a API exposta no host, quem chamasse direto podia forjar o `X-Forwarded-For` e driblar o limite de tentativas do login, que conta tentativas por IP. Tirei a porta da API: agora todo acesso passa pelo nginx, que é quem informa o IP real.
+
+**Nem toda atualização é melhoria.** No primeiro push, o Dependabot abriu sete PRs. Três entraram; os outros trocavam a versão do Java ou do Node só em uma das imagens, ou subiam o TypeScript para uma versão que o Angular ainda não aceita. Atualizar dependência também é decisão de projeto, e o CI é o que permite tomar essa decisão com segurança.
 
 ---
 
