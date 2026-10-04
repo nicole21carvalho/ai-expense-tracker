@@ -1,0 +1,66 @@
+# Perfil padrao: H2 em memoria. Permite rodar "mvn spring-boot:run" sem Docker.
+spring:
+  application:
+    name: cofre
+  datasource:
+    url: jdbc:h2:mem:cofre;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    web:
+      pageable:
+        # Formato de Page com contrato estavel: { content, page: {...} }.
+        # O padrao (direct) serializa a PageImpl crua, cujo JSON o Spring Data
+        # nao garante entre versoes, e loga um aviso a cada listagem.
+        serialization-mode: via-dto
+
+cofre:
+  jwt:
+    # Vem so de variavel de ambiente, sem valor padrao: um padrao aqui seria
+    # uma chave publica. Sem a variavel, o JwtService impede a subida.
+    secret: ${COFRE_JWT_SECRET:}
+    expiracao-minutos: 120
+  ia:
+    # Sem chave configurada a aplicacao usa o categorizador por regras.
+    # Com chave, usa o modelo. Os dois implementam a mesma interface.
+    api-key: ${COFRE_IA_API_KEY:}
+    endpoint: https://api.anthropic.com/v1/messages
+    # Nome mostrado ao usuario no pedido de consentimento. Trocar junto com o
+    # endpoint: o usuario precisa saber para quem o dado vai (LGPD, art. 9, V).
+    provedor: Anthropic
+    modelo: claude-sonnet-4-6
+
+server:
+  port: 8080
+
+logging:
+  level:
+    # INFO em todos os perfis. DEBUG tende a registrar dado de usuario
+    # (descricao de transacao, e-mail), e log costuma ir para lugares com
+    # menos protecao que o banco. Para depurar localmente, sem mudar arquivo:
+    #   LOGGING_LEVEL_BR_COM_NICOLE_COFRE=DEBUG mvn spring-boot:run
+    br.com.nicole.cofre: INFO
+
+---
+# Perfil usado pelo docker-compose, com Postgres.
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:db}:5432/${DB_NAME:cofre}
+    username: ${DB_USER:cofre}
+    # Sem valor padrao: a senha vem do .env pelo docker-compose.
+    password: ${DB_PASSWORD}
+server:
+  # Atras do nginx, o IP de conexao e sempre o do nginx. Com isto o Tomcat usa
+  # o X-Forwarded-For, mas so quando vem de rede interna (o proprio nginx), e
+  # o limite de tentativas passa a valer por cliente, nao para todos juntos.
+  forward-headers-strategy: native

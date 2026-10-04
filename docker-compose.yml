@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cofre
+      POSTGRES_USER: cofre
+      # Vem do .env, como a chave do JWT. Senha fixa aqui seria a mesma em
+      # toda maquina que clonasse o repositorio.
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD no .env (openssl rand -hex 24)}
+    volumes:
+      # Volume nomeado: sem isto o banco zera a cada "docker compose down".
+      - dados_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cofre"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db
+      DB_NAME: cofre
+      DB_USER: cofre
+      # ":?" faz o compose parar com erro se a variavel faltar ou estiver vazia.
+      DB_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD no .env (openssl rand -hex 24)}
+      COFRE_JWT_SECRET: ${COFRE_JWT_SECRET:?defina COFRE_JWT_SECRET no .env (openssl rand -base64 48)}
+      COFRE_IA_API_KEY: ${COFRE_IA_API_KEY:-}
+    # Sem "ports" de proposito: a API so e alcancavel pela rede interna do
+    # compose, atraves do nginx. Publicada no host, ela recebia requisicoes
+    # sem passar pelo nginx, e quem chamasse direto podia forjar o
+    # X-Forwarded-For e driblar o limite de tentativas do login.
+    expose:
+      - "8080"
+    depends_on:
+      # "service_healthy" e nao "service_started": sem isso a API sobe
+      # antes do Postgres aceitar conexao e morre no Flyway.
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+
+volumes:
+  dados_postgres:

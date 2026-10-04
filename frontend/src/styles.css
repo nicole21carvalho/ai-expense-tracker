@@ -1,0 +1,128 @@
+/*
+  Tokens do Cofre.
+
+  A paleta de categorias vem das cédulas do Real: azul do 2, roxo do 5,
+  vermelho do 10, amarelo do 20, marrom do 50, verde do 100. Escolha
+  deliberada — dá identidade brasileira sem precisar de bandeirinha, e
+  cada categoria fica reconhecível pela cor antes de ler o nome.
+*/
+
+:root {
+  /* Base */
+  --tinta:      #16324F;  /* azul profundo, cabeçalho e saldo */
+  --tinta-fraca:#2A4A6B;
+  --papel:      #FBFAF7;  /* fundo das superfícies */
+  --fundo:      #F2EFE9;  /* fundo da página */
+  --borda:      #E0DACE;
+  --texto:      #1E2227;
+  --sutil:      #76736C;  /* cinza quente, não o cinza azulado de framework */
+
+  /* Valores */
+  --entrada:    #2F7A4F;
+  --saida:      #C44536;
+
+  /* Cédulas */
+  --nota-2:   #2E6DA4;
+  --nota-5:   #7B5EA7;
+  --nota-10:  #C44536;
+  --nota-20:  #D99014;
+  --nota-50:  #8C6239;
+  --nota-100: #2F7A4F;
+
+  /* Tipografia */
+  --fonte-texto: 'Instrument Sans', system-ui, sans-serif;
+  --fonte-numero: 'Spline Sans Mono', ui-monospace, monospace;
+
+  /* Espaço */
+  --gutter: 1.5rem;
+  --raio: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) {
+    --papel: #191C21;
+    --fundo: #111419;
+    --borda: #2B3039;
+    --texto: #E8E4DC;
+    --sutil: #9A958B;
+    --tinta: #0E1C2C;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte-texto);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+/* Números de dinheiro sempre tabulares: sem isso as colunas desalinham
+   quando um valor tem 1 e outro tem 8 — o 1 é mais estreito. */
+.numero {
+  font-family: var(--fonte-numero);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border-radius: var(--raio);
+}
+
+input, select {
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--papel);
+  color: var(--texto);
+  width: 100%;
+}
+
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--nota-2);
+  outline-offset: 2px;
+}
+
+.btn-principal {
+  background: var(--tinta);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.1rem;
+  font-weight: 600;
+}
+.btn-principal:hover { background: var(--tinta-fraca); }
+.btn-principal:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-discreto {
+  background: transparent;
+  color: var(--sutil);
+  border: 1px solid var(--borda);
+  padding: 0.5rem 0.8rem;
+}
+.btn-discreto:hover { color: var(--texto); border-color: var(--sutil); }
+
+.erro {
+  color: var(--saida);
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
