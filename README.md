@@ -6,7 +6,7 @@
 
 Você lança o gasto, o Cofre descobre a categoria.
 
-[![CI](https://github.com/nicole21carvalho/cofre/actions/workflows/ci.yml/badge.svg)](https://github.com/nicole21carvalho/cofre/actions/workflows/ci.yml)
+[![CI](https://github.com/nicole21carvalho/ai-expense-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/nicole21carvalho/ai-expense-tracker/actions/workflows/ci.yml)
 ![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?logo=springboot&logoColor=white)
 ![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
@@ -85,8 +85,8 @@ A API não é publicada no host: todo acesso passa pelo nginx, que é quem infor
 Com Docker, sobe tudo:
 
 ```bash
-git clone https://github.com/nicole21carvalho/cofre.git
-cd cofre
+git clone https://github.com/nicole21carvalho/ai-expense-tracker.git
+cd ai-expense-tracker
 cp .env.example .env
 # Preencha no .env:
 #   COFRE_JWT_SECRET, por exemplo com: openssl rand -base64 48
