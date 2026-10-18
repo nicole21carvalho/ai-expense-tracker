@@ -27,6 +27,21 @@ Você lança o gasto, o Cofre descobre a categoria.
 
 </div>
 
+## 🌎 In English
+
+A personal finance tracker with **automatic expense categorization by AI**: you log the expense, Cofre figures out
+the category.
+
+- Two implementations behind one `Categorizador` interface: a keyword classifier that works with no API key (and is
+  the baseline) and a **language model** for descriptions that rules can't handle.
+- The model's answer is **validated** against the user's own categories, and a network failure returns "no
+  suggestion" instead of an error.
+- **Spring Security** with JWT, login rate limiting behind nginx, and LGPD consent before any data leaves the app.
+- CI with actions pinned by commit SHA and dependency vulnerability scanning (osv-scanner).
+  *Java 21 · Spring Boot 4 · Spring Security · Angular · PostgreSQL · Docker.*
+
+*The rest of this README is in Portuguese.*
+
 ---
 
 ## 🎯 O que resolve
